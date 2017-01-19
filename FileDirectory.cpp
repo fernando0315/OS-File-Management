@@ -1,6 +1,7 @@
 #include "FileDirectory.h"
 #include <iostream>
 #include <iomanip>
+#include <bitset>
 
 using namespace std;
 
@@ -41,7 +42,7 @@ bool FileDirectory::create(char filename[], int numberBytes)
 
 			if (j == size)
 			{
-				cout << "Please rename youe file!" << endl;
+				cout << "This directory already contains a file name '" << filename << '\'' << endl;
 				return false;
 			}
 		}
@@ -149,7 +150,6 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 	//seach until all clusters are found
 	allocatedBytes = 4;
 	unsigned short int nextClusterAddress, currentClusterAddress;
-	
 
 	currentClusterAddress = firstClusterAddress;
 
@@ -173,6 +173,7 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 		{
 			data[emptyDataIndex] = dat[allocatedDataIndex++];
 		}
+		
 		allocatedBytes += 4;
 	}
 	
@@ -300,13 +301,13 @@ void FileDirectory::printDirectory()
 
 			//Print data size
 			unsigned int numberBytes;
-			numberBytes = fileDirectory[i][31] << 8;
+			numberBytes = fileDirectory[i][31];
 			numberBytes <<= 8;
-			numberBytes = fileDirectory[i][30];
+			numberBytes += fileDirectory[i][30];
 			numberBytes <<= 8;
-			numberBytes = fileDirectory[i][29];
+			numberBytes += fileDirectory[i][29];
 			numberBytes <<= 8;
-			numberBytes = fileDirectory[i][28];
+			numberBytes += fileDirectory[i][28];
 			cout << numberBytes << '\t';
 
 			//print filename + ext
@@ -324,6 +325,7 @@ void FileDirectory::printData(char filename[]) {
 	for (int i = 0; i < 256; i++) 
 			cout << setw(3) << setfill(' ') << left << i << "| " << data[i] << endl;
 	*/
+	
 	
 	unsigned short int index;
 
@@ -368,4 +370,3 @@ bool FileDirectory::isFound(char filename[], unsigned short int &index)
 
 	return index < 4 ? true : false;
 }
-

@@ -8,31 +8,39 @@ int main()
 {
 	FileDirectory f1;
 	char data[500];
+	unsigned int size;
 
-	if (f1.create("file1", 4))
-		f1.write("file1", "txt", 4, "1111", 1994, 10, 15, 18, 45, 35);
+	size = 40;
+	strcpy_s(data, string(size, '2').c_str());
+	if (f1.create("file1", size))
+		f1.write("file1", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
-	strcpy_s(data, string(20, '2').c_str());
-	if (f1.create("file2", 20))
-		f1.write("file2", "txt", 20, data, 1994, 10, 15, 18, 45, 35);
+	size = 200;
+	strcpy_s(data, string(size, '2').c_str());
+	if (f1.create("file2", size))
+		f1.write("file2", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
-	strcpy_s(data, string(30, '3').c_str());
-	if (f1.create("file3", 30))
-		f1.write("file3", "txt", 30, data, 1994, 10, 15, 18, 45, 35);
+	size = 300;
+	strcpy_s(data, string(size, '3').c_str());
+	if (f1.create("file3", size))
+		f1.write("file3", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
-	strcpy_s(data, string(50, '4').c_str());
-	if (f1.create("file4", 50))
-		f1.write("file4", "txt", 50, data, 1994, 10, 15, 18, 45, 35);
+	size = 500;
+	strcpy_s(data, string(size, '4').c_str());
+	if (f1.create("file4", size))
+		f1.write("file4", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 	
-	f1.deleteFile("file2");
+	//f1.deleteFile("file2");
 
-	if (f1.create("file4", 50))
-		f1.write("file4", "txt", 50, data, 1994, 10, 15, 18, 45, 35);
+	strcpy_s(data, string(size, '4').c_str());
+	if (f1.create("file4", size))
+		f1.write("file4", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
+	//f1.printData("");
 	f1.printDirectory();
 
-	//f1.printClusters("file4");
-	//f1.read("name");
+	//f1.printClusters("file2");
+	//f1.read("file3");
 	//cout << endl;
 	
 	//f1.deleteFile("halo");
