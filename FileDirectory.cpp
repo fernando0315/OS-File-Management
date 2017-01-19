@@ -16,9 +16,13 @@ FileDirectory::FileDirectory()
 	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 32; j++)
 			fileDirectory[i][j] = 0;
+
+	for (auto &str : fileDirectory)
+		for(auto &chr : str)
+			chr = 0;
 }
 
-bool FileDirectory::create(char filename[], int numberBytes)
+bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 {
 	bool unusedEntry = false;
 	bool memoryIsFull = false;
@@ -35,6 +39,7 @@ bool FileDirectory::create(char filename[], int numberBytes)
 		}
 		else
 		{
+			//Compare the filename
 			size = strlen(filename);
 
 			for (j = 0; j < size; j++)
@@ -42,17 +47,29 @@ bool FileDirectory::create(char filename[], int numberBytes)
 
 			if (j == size)
 			{
-				cout << "This directory already contains a file name '" << filename << '\'' << endl;
-				return false;
+				//compare the file extension
+				char extension[4] = "\0";
+				for (int k = 0; k < 3; k++)
+					extension[k] = fileDirectory[i][8 + k];
+
+				cout << "masuk: " << extension << '|' << ext << endl;
+
+				//Exit if filename exist in directory
+				if (strcmp(extension, ext) == 0)
+				{
+					cout << "This directory already contains a file name '" 
+						<< filename << '.' << ext << '\'' << endl;
+					return false;
+				}
 			}
 		}
 	}
-
+	
 	//Check if there are space for dataFile
 	unsigned short int numOfNeededSector = numberBytes / 4;
 	numOfNeededSector += numberBytes % 4 == 0 ? 0 : 1;
 	unsigned short int availableSector = 0;
-
+	
 	if (unusedEntry) 
 		for (unsigned short int &sector : FAT16)
 		{
@@ -61,9 +78,10 @@ bool FileDirectory::create(char filename[], int numberBytes)
 				if (++availableSector > numOfNeededSector)
 					return true;
 			}
-			
 		}
-	
+
+	cout << "There are no more memory space" << endl;
+
 	return false;
 }
 
@@ -94,11 +112,11 @@ bool FileDirectory::read(char filename[])
 		unsigned int numberBytes;
 		numberBytes = fileDirectory[i][31];
 		numberBytes <<= 8;
-		numberBytes = fileDirectory[i][30];
+		numberBytes += fileDirectory[i][30];
 		numberBytes <<= 8;
-		numberBytes = fileDirectory[i][29];
+		numberBytes += fileDirectory[i][29];
 		numberBytes <<= 8;
-		numberBytes = fileDirectory[i][28];
+		numberBytes += fileDirectory[i][28];
 		cout << numberBytes << '\t';
 		//print filename + ext
 		for (int j = 0; j < 8 && fileDirectory[i][j] != 0; j++) cout << fileDirectory[i][j];
@@ -141,7 +159,6 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 		}
 	}
 
-	
 	emptyDataIndex = firstClusterAddress * 4;
 	FAT16[firstClusterAddress] = 255;
 	for (int i = 0; i < 4 && allocatedDataIndex < numberBytes; i++, emptyDataIndex++)
@@ -177,7 +194,6 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 		allocatedBytes += 4;
 	}
 	
-
 	//Write name first letter in low byte
 	for (int j = 0; j < 8; j++) fileDirectory[emptyIndex][j] = filename[j];
 	//write ext [8:10]
@@ -326,7 +342,6 @@ void FileDirectory::printData(char filename[]) {
 			cout << setw(3) << setfill(' ') << left << i << "| " << data[i] << endl;
 	*/
 	
-	
 	unsigned short int index;
 
 	if (isFound(filename, index))		//if file is found
@@ -351,7 +366,6 @@ void FileDirectory::printData(char filename[]) {
 	{
 		cout << "filename not found!" << endl;
 	}
-	
 }
 
 //Private function

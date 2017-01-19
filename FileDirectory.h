@@ -1,7 +1,7 @@
 class FileDirectory {
 public:
 	FileDirectory();
-	bool create(char filename[], int numberBytes);
+	bool create(char filename[], char ext[], int numberBytes);
 	bool deleteFile(char filename[]);
 	bool read(char filename[]);
 	void write(char filename[], char ext[], int numberBytes, char dat[], int year, int month, int day,

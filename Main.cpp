@@ -7,35 +7,36 @@ using namespace std;
 int main()
 {
 	FileDirectory f1;
-	char data[500];
+	char data[1000];
 	unsigned int size;
 
 	size = 40;
 	strcpy_s(data, string(size, '2').c_str());
-	if (f1.create("file1", size))
+	if (f1.create("file1", "txt", size))
 		f1.write("file1", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
 	size = 200;
 	strcpy_s(data, string(size, '2').c_str());
-	if (f1.create("file2", size))
+	if (f1.create("file2", "txt", size))
 		f1.write("file2", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 
 	size = 300;
 	strcpy_s(data, string(size, '3').c_str());
-	if (f1.create("file3", size))
-		f1.write("file3", "txt", size, data, 1994, 10, 15, 18, 45, 35);
-
+	if (f1.create("file2", "txt", size))
+		f1.write("file2", "txt", size, data, 1994, 10, 15, 18, 45, 35);
+	
+	/*
 	size = 500;
 	strcpy_s(data, string(size, '4').c_str());
-	if (f1.create("file4", size))
+	if (f1.create("file4", "txt", size))
 		f1.write("file4", "txt", size, data, 1994, 10, 15, 18, 45, 35);
 	
 	//f1.deleteFile("file2");
 
 	strcpy_s(data, string(size, '4').c_str());
-	if (f1.create("file4", size))
+	if (f1.create("file4", "txt", size))
 		f1.write("file4", "txt", size, data, 1994, 10, 15, 18, 45, 35);
-
+	*/
 	//f1.printData("");
 	f1.printDirectory();
 
