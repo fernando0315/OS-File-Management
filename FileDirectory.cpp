@@ -22,6 +22,8 @@ bool FileDirectory::create(char filename[], int numberBytes)
 	bool unusedEntry = false;
 	bool memoryIsFull = false;
 	int allocatedMemory = 0;
+	int size;
+	int j;
 
 	//Check if there are still space for file directory
 	for (int i = 0; i < 4; i++) 
@@ -30,6 +32,19 @@ bool FileDirectory::create(char filename[], int numberBytes)
 		{
 			unusedEntry = true;
 			break;
+		}
+		else
+		{
+			size = strlen(filename);
+
+			for (j = 0; j < size; j++)
+				if (filename[j] != fileDirectory[i][j]) break;
+
+			if (j == size)
+			{
+				cout << "Please rename youe file!" << endl;
+				return false;
+			}
 		}
 	}
 
@@ -266,9 +281,7 @@ void FileDirectory::printDirectory()
 
 	for (int i = 0; i < 4; i++)
 	{
-		if (fileDirectory[i][0] == 0)
-			cout << "Empty space";
-		else
+		if (fileDirectory[i][0] != 0)
 		{
 			//Print date
 			unsigned short int date;
@@ -304,9 +317,8 @@ void FileDirectory::printDirectory()
 			for (int j = 0; j < 8 && fileDirectory[i][j] != 0; j++) cout << fileDirectory[i][j];
 			cout << '.';
 			for (int j = 8; j < 11; j++) cout << fileDirectory[i][j];
+			cout << endl;
 		}
-
-		cout << endl;
 	}
 }
 
@@ -314,9 +326,9 @@ void FileDirectory::printData(char filename[]) {
 
 	/*
 	for (int i = 0; i < 256; i++) 
-			cout << setw(3) << left << i << "| " << data[i] << endl;
+			cout << setw(3) << setfill(' ') << left << i << "| " << data[i] << endl;
 	*/
-
+	
 	unsigned short int index;
 
 	if (isFound(filename, index))		//if file is found
@@ -341,12 +353,13 @@ void FileDirectory::printData(char filename[]) {
 	{
 		cout << "filename not found!" << endl;
 	}
+	
 }
 
 //Private function
 bool FileDirectory::isFound(char filename[], unsigned short int &index)
 {
-	int size = sizeof(filename);
+	int size = strlen(filename);
 	int j;
 
 	for (index = 0; index < 4; index++)
