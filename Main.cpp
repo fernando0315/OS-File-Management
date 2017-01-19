@@ -20,16 +20,18 @@ int main()
 	if (f1.create("file3", 30))
 		f1.write("file3", "txt", 30, data, 1994, 10, 15, 18, 45, 35);
 
-	//strcpy_s(data, string(50, '4').c_str());
-	//if (f1.create("file4", 50))
-	//	f1.write("file1", "txt", 50, data, 1994, 10, 15, 18, 45, 35);
-
-	//f1.write("halo", "cpp", 3, "tje", 1994, 10, 15, 15, 45, 35);
-	//f1.write("name", "cpp", 5, "farad", 2015, 8, 20, 15, 45, 35);
+	strcpy_s(data, string(50, '4').c_str());
+	if (f1.create("file4", 50))
+		f1.write("file4", "txt", 50, data, 1994, 10, 15, 18, 45, 35);
 	
+	f1.deleteFile("file2");
+
+	if (f1.create("file4", 50))
+		f1.write("file4", "txt", 50, data, 1994, 10, 15, 18, 45, 35);
+
 	f1.printDirectory();
-	//f1.printData("file2");
-	f1.printClusters("file3");
+
+	//f1.printClusters("file4");
 	//f1.read("name");
 	//cout << endl;
 	

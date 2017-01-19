@@ -31,7 +31,6 @@ bool FileDirectory::create(char filename[], int numberBytes)
 		if (fileDirectory[i][0] == 0)
 		{
 			unusedEntry = true;
-			break;
 		}
 		else
 		{
@@ -81,7 +80,6 @@ bool FileDirectory::read(char filename[])
 		month = (date & 0x01E0) >> 5;
 		year = ((fileDirectory[i][25] & 0xFE) >> 1) + 1980;
 		cout << setfill('0') << setw(2) << month << '/' << day << '/' << year << '\t';
-
 		//Print time
 		unsigned short int time;
 		time = (fileDirectory[i][23] << 8) + fileDirectory[i][22];
@@ -91,7 +89,6 @@ bool FileDirectory::read(char filename[])
 		cout << ":";
 		cout << ((time & 0x001F) << 1);
 		cout << "\t";
-
 		//Print data size
 		unsigned int numberBytes;
 		numberBytes = fileDirectory[i][31];
@@ -102,7 +99,6 @@ bool FileDirectory::read(char filename[])
 		numberBytes <<= 8;
 		numberBytes = fileDirectory[i][28];
 		cout << numberBytes << '\t';
-
 		//print filename + ext
 		for (int j = 0; j < 8 && fileDirectory[i][j] != 0; j++) cout << fileDirectory[i][j];
 		cout << '.';
@@ -290,7 +286,7 @@ void FileDirectory::printDirectory()
 			day = date & 0x001F;
 			month = (date & 0x01E0) >> 5;
 			year = ((fileDirectory[i][25] & 0xFE) >> 1) + 1980;
-			cout << setfill('0') << setw(2) << month << '/' << day << '/' << year  << '\t';
+			cout << setfill('0') << setw(2) << month << '/' << day << '/' << year << '\t';
 
 			//Print time
 			unsigned short int time;
@@ -304,7 +300,7 @@ void FileDirectory::printDirectory()
 
 			//Print data size
 			unsigned int numberBytes;
-			numberBytes = fileDirectory[i][31];
+			numberBytes = fileDirectory[i][31] << 8;
 			numberBytes <<= 8;
 			numberBytes = fileDirectory[i][30];
 			numberBytes <<= 8;
@@ -372,3 +368,4 @@ bool FileDirectory::isFound(char filename[], unsigned short int &index)
 
 	return index < 4 ? true : false;
 }
+
