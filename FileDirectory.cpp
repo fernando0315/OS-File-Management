@@ -79,7 +79,8 @@ bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 		}
 	else
 	{
-		cout << "There are no more space inside the directory.\n" << endl;
+		cout << "There are no more space inside the directory for \"" <<
+			filename << "\"." << ext << endl;
 		return false;
 	}
 	cout << "There are not enough memory space for \"" << filename 
@@ -163,7 +164,7 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 	}
 
 	emptyDataIndex = firstClusterAddress * 4;
-	FAT16[firstClusterAddress] = 255;
+	FAT16[firstClusterAddress] = 0xFFFF;
 	for (int i = 0; i < 4 && allocatedDataIndex < numberBytes; i++, emptyDataIndex++)
 		data[emptyDataIndex] = dat[allocatedDataIndex++];
 
@@ -172,7 +173,7 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 	unsigned short int nextClusterAddress, currentClusterAddress;
 
 	currentClusterAddress = firstClusterAddress;
-
+	//find all sectors and connect one to another
 	while (allocatedBytes < numberBytes)
 	{
 		for (int i = firstClusterAddress + 1; i < 256; i++)
@@ -184,9 +185,11 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 			}
 		}
 
+		//Set the link list
 		FAT16[currentClusterAddress] = nextClusterAddress;
+		FAT16[nextClusterAddress] = 0xFFFF;
+		//update current cluster address
 		currentClusterAddress = nextClusterAddress;
-		FAT16[currentClusterAddress] = 255;
 
 		emptyDataIndex = currentClusterAddress * 4;
 		for (int i = 0; i < 4 && allocatedDataIndex < numberBytes; i++, emptyDataIndex++)
@@ -240,7 +243,7 @@ bool FileDirectory::deleteFile(char filename[], char ext[]) {
 		delSecAddress <<= 8;
 		delSecAddress = fileDirectory[index][26];
 
-		while (delSecAddress != 255)
+		while (delSecAddress < 0xFFF8)
 		{
 			nextSecAddress = FAT16[delSecAddress];
 			FAT16[delSecAddress] = 0;
@@ -274,7 +277,7 @@ void FileDirectory::printClusters(char filename[], char ext[]) {
 		{
 			cout << secAddress;
 			secAddress = FAT16[secAddress];
-			if (secAddress != 255)
+			if (secAddress < 0xFFF8)
 			{
 				cout << "->";
 			}
@@ -356,7 +359,7 @@ void FileDirectory::printData(char filename[], char ext[]) {
 		secAddress <<= 8;
 		secAddress = fileDirectory[index][26];
 
-		while (secAddress != 255)
+		while (secAddress < 0xFFF8)
 		{
 			//cout << secAddress;
 			for (int i = 0; i < 4; i++)
@@ -396,13 +399,12 @@ bool FileDirectory::isFound(char filename[], char ext[], unsigned short int &ind
 
 			//Exit if filename exist in directory
 			if (strcmp(extension, ext) == 0)
-			{
-				cout << "This directory already contains a file name '"
-					<< filename << '.' << ext << '\'' << endl << endl;
 				return true;
-			}
 		}
 	}
+
+	cout << "This directory does not contains a file name '"
+		<< filename << '.' << ext << '\'' << endl << endl;
 
 	return false;
 }
