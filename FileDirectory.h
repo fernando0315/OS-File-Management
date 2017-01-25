@@ -2,13 +2,13 @@ class FileDirectory {
 public:
 	FileDirectory();
 	bool create(char filename[], char ext[], int numberBytes);
-	bool deleteFile(char filename[]);
-	bool read(char filename[]);
+	bool deleteFile(char filename[], char ext[]);
+	bool read(char filename[], char ext[]);
 	void write(char filename[], char ext[], int numberBytes, char dat[], int year, int month, int day,
 		       int hour, int minute, int second);
-	void printClusters(char filename[]);
+	void printClusters(char filename[], char ext[]);
 	void printDirectory();
-	void printData(char filename[]);
+	void printData(char filename[], char ext[]);
 
 private:
 	unsigned char fileDirectory[4][32];
@@ -23,5 +23,5 @@ private:
 	unsigned short int FAT16[256];	//256 clusters only
 	unsigned char data[1024];		//256 clusters * 4 bytes/cluster = 1,024 bytes
 
-	bool isFound(char filename[], unsigned short int &index);
+	bool isFound(char filename[], char ext[], unsigned short int &index);
 };

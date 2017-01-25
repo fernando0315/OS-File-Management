@@ -42,7 +42,7 @@ bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 			//Compare the filename
 			size = strlen(filename);
 
-			for (j = 0; j < size; j++)
+			for (j = 0; j < size; j++) 
 				if (filename[j] != fileDirectory[i][j]) break;
 
 			if (j == size)
@@ -52,13 +52,11 @@ bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 				for (int k = 0; k < 3; k++)
 					extension[k] = fileDirectory[i][8 + k];
 
-				cout << "masuk: " << extension << '|' << ext << endl;
-
 				//Exit if filename exist in directory
 				if (strcmp(extension, ext) == 0)
 				{
 					cout << "This directory already contains a file name '" 
-						<< filename << '.' << ext << '\'' << endl;
+						<< filename << '.' << ext << '\'' << endl << endl;
 					return false;
 				}
 			}
@@ -70,7 +68,7 @@ bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 	numOfNeededSector += numberBytes % 4 == 0 ? 0 : 1;
 	unsigned short int availableSector = 0;
 	
-	if (unusedEntry) 
+	if (unusedEntry)
 		for (unsigned short int &sector : FAT16)
 		{
 			if (sector == 0 || sector == 1)
@@ -79,17 +77,22 @@ bool FileDirectory::create(char filename[], char ext[], int numberBytes)
 					return true;
 			}
 		}
-
-	cout << "There are no more memory space" << endl;
+	else
+	{
+		cout << "There are no more space inside the directory.\n" << endl;
+		return false;
+	}
+	cout << "There are not enough memory space for \"" << filename 
+		<< '.' << ext << "'."<< endl << endl;
 
 	return false;
 }
 
-bool FileDirectory::read(char filename[])
+bool FileDirectory::read(char filename[], char ext[])
 {
 	unsigned short int i;
 
-	if (isFound(filename, i))
+	if (isFound(filename, ext, i))
 	{
 		//Print date
 		unsigned short int date;
@@ -102,11 +105,11 @@ bool FileDirectory::read(char filename[])
 		//Print time
 		unsigned short int time;
 		time = (fileDirectory[i][23] << 8) + fileDirectory[i][22];
-		cout << ((time & 0xF800) >> 11);
+		cout << setw(2) << setfill('0') << right << ((time & 0xF800) >> 11);
 		cout << ":";
-		cout << ((time & 0x07E0) >> 5);
+		cout << setw(2) << setfill('0') << right << ((time & 0x07E0) >> 5);
 		cout << ":";
-		cout << ((time & 0x001F) << 1);
+		cout << setw(2) << setfill('0') << right << ((time & 0x001F) << 1);
 		cout << "\t";
 		//Print data size
 		unsigned int numberBytes;
@@ -124,8 +127,8 @@ bool FileDirectory::read(char filename[])
 		for (int j = 8; j < 11; j++) cout << fileDirectory[i][j];
 
 		cout << endl;
-		printClusters(filename);
-		printData(filename);
+		printClusters(filename, ext);
+		printData(filename, ext);
 
 		return true;
 	}
@@ -226,10 +229,10 @@ void FileDirectory::write(char filename[], char ext[], int numberBytes, char dat
 	fileDirectory[emptyIndex][28] = numberBytes;
 }
 
-bool FileDirectory::deleteFile(char filename[]) {
+bool FileDirectory::deleteFile(char filename[], char ext[]) {
 	unsigned short int index;
 
-	if (isFound(filename, index))		//if file is found
+	if (isFound(filename, ext, index))		//if file is found
 	{
 		//clear sector
 		unsigned short int delSecAddress, nextSecAddress;
@@ -257,10 +260,10 @@ bool FileDirectory::deleteFile(char filename[]) {
 }
 
 
-void FileDirectory::printClusters(char filename[]) {
+void FileDirectory::printClusters(char filename[], char ext[]) {
 	unsigned short int index;
 
-	if (isFound(filename, index))		//if file is found
+	if (isFound(filename, ext, index))		//if file is found
 	{
 		unsigned short int secAddress;
 		secAddress = fileDirectory[index][27];
@@ -308,11 +311,11 @@ void FileDirectory::printDirectory()
 			//Print time
 			unsigned short int time;
 			time = (fileDirectory[i][23] << 8) + fileDirectory[i][22];
-			cout << ((time & 0xF800) >> 11);
+			cout << setw(2) << setfill('0') << right << ((time & 0xF800) >> 11);
 			cout << ":";
-			cout << ((time & 0x07E0) >> 5);
+			cout << setw(2) << setfill('0') << right << ((time & 0x07E0) >> 5);
 			cout << ":";
-			cout << ((time & 0x001F) << 1);
+			cout << setw(2) << setfill('0') << right << ((time & 0x001F) << 1);
 			cout << "\t";
 
 			//Print data size
@@ -335,7 +338,7 @@ void FileDirectory::printDirectory()
 	}
 }
 
-void FileDirectory::printData(char filename[]) {
+void FileDirectory::printData(char filename[], char ext[]) {
 
 	/*
 	for (int i = 0; i < 256; i++) 
@@ -344,8 +347,10 @@ void FileDirectory::printData(char filename[]) {
 	
 	unsigned short int index;
 
-	if (isFound(filename, index))		//if file is found
+	if (isFound(filename, ext, index))		//if file is found
 	{
+		cout << "Data at \"" << filename << "\":" << endl;
+
 		unsigned short int secAddress;
 		secAddress = fileDirectory[index][27];
 		secAddress <<= 8;
@@ -366,21 +371,38 @@ void FileDirectory::printData(char filename[]) {
 	{
 		cout << "filename not found!" << endl;
 	}
+
+	cout << endl;
 }
 
 //Private function
-bool FileDirectory::isFound(char filename[], unsigned short int &index)
+bool FileDirectory::isFound(char filename[], char ext[], unsigned short int &index)
 {
 	int size = strlen(filename);
 	int j;
 
 	for (index = 0; index < 4; index++)
 	{
+		//check for filename
 		for (j = 0; j < size; j++)
 			if (filename[j] != fileDirectory[index][j]) break;
 
-		if (j == size) break;
+		if (j == size) 	
+		{
+			//compare the file extension
+			char extension[4] = "\0";
+			for (int k = 0; k < 3; k++)
+				extension[k] = fileDirectory[index][8 + k];
+
+			//Exit if filename exist in directory
+			if (strcmp(extension, ext) == 0)
+			{
+				cout << "This directory already contains a file name '"
+					<< filename << '.' << ext << '\'' << endl << endl;
+				return true;
+			}
+		}
 	}
 
-	return index < 4 ? true : false;
+	return false;
 }
